@@ -56,21 +56,21 @@
 
 **Why it matters:** Broad origins, credentials and unsafe methods can expand browser attack surface.
 
-**Detect:** Inspect allowed origins, credentials, methods and headers in deployed configuration.
+**Detect:** Inspect allowed origins, credentials, methods and headers in deployed configuration. Check whether the Origin or Referer header is used as an authentication or authorization gate: test each operation with an absent, a foreign and an approved Origin. CORS governs browsers, not callers that omit or forge the header.
 
 **Evidence:** Effective CORS policy and browser test.
 
 **Remediation:** Explicit allowlist of trusted origins; avoid wildcard credentials and unnecessary methods.
 
-**Regression test:** Untrusted origin is denied while approved origin works.
+**Regression test:** Untrusted origin is denied while approved origin works. Requests with an absent, foreign or approved Origin get the same authentication outcome.
 
-**False-fix traps:** CORS is not an authorization mechanism and does not protect non-browser clients.
+**False-fix traps:** CORS is not an authorization mechanism and does not protect non-browser clients. An Origin-gated 401 is bypassed by any non-browser client; the check must be on the credential.
 
 **False positives:** Wildcard origins on public, credential-free, non-sensitive read endpoints.
 
-**Provenance:** SRC-002, SRC-003
+**Provenance:** SRC-002, SRC-003, SRC-005
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## PLAT-004 — Security headers and browser protections are missing or inconsistent
 **Domain:** Platform  
@@ -80,21 +80,21 @@
 
 **Why it matters:** Missing browser controls can increase impact of XSS, framing and content-type attacks.
 
-**Detect:** Inspect effective response headers for CSP, frame protections, content type, referrer policy and HSTS where appropriate.
+**Detect:** Inspect effective response headers for CSP, frame protections, content type, referrer policy and HSTS where appropriate. Parse the CSP rather than reading it: malformed directives are silently ignored, and unsafe-inline or unsafe-eval in script directives neutralise it as an XSS control. Also check responses and cookies for fingerprint and internal-host leaks (server and framework headers, load-balancer cookie domains).
 
 **Evidence:** Actual HTTP responses in each environment.
 
 **Remediation:** Apply a reviewed header baseline and test it in CI/deployment checks.
 
-**Regression test:** Required headers and values are present on representative responses.
+**Regression test:** Required headers and values are present on representative responses. The CSP parses without browser-console errors and has no unsafe-inline or unsafe-eval in script sources; fingerprint headers and internal host names are absent.
 
 **False-fix traps:** Setting a header in source without verifying reverse proxy/CDN behavior is incomplete.
 
 **False positives:** Headers set by a verified reverse proxy or CDN rather than the application; legacy headers deprecated by current standards.
 
-**Provenance:** SRC-002, SRC-003
+**Provenance:** SRC-002, SRC-003, SRC-005, SRC-006
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## PLAT-005 — Deployment configuration differs materially from source without verification
 **Domain:** Platform  
@@ -104,13 +104,13 @@
 
 **Why it matters:** Pipeline token replacement, environment variables or manual changes can reintroduce vulnerabilities.
 
-**Detect:** Compare repository config, build artifacts, pipeline templates and runtime configuration. Record which layer each claim was verified against (source, repo config, deployed, external).
+**Detect:** Compare repository config, build artifacts, pipeline templates and runtime configuration. Record which layer each claim was verified against (source, repo config, deployed, external). Check environment separation: production configuration that points to demo, staging, test or shared-tenant hosted endpoints (including identity or verification services), mislabelled environment names, and internal hostnames leaking through responses. A hosted-service hostname can expire or be re-registered by another party.
 
 **Evidence:** Diff and deployment mechanism.
 
 **Remediation:** Treat deployment configuration as code, validate generated artifacts and add environment security checks. Verify the deployed state directly (request the live endpoint, read effective configuration) rather than inferring it from the repository.
 
-**Regression test:** CI/CD produces an auditable, expected security configuration.
+**Regression test:** CI/CD produces an auditable, expected security configuration. Production configuration references only owned, production-grade endpoints, and the environment label matches the deployment.
 
 **False-fix traps:** Reviewing only repository config misses pipeline-injected settings. A setting committed to the repository is OPEN (repo config) and its deployed effect is NEEDS VERIFICATION until observed; see "Verified against" in `references/status-and-severity.md`.
 
@@ -118,9 +118,9 @@
 
 **Chains with:** SECRET-004
 
-**Provenance:** SRC-001, SRC-002, SRC-004
+**Provenance:** SRC-001, SRC-002, SRC-004, SRC-005, SRC-006
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## PLAT-006 — TLS/certificate validation is disabled or weakened
 **Domain:** Platform  

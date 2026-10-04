@@ -5,10 +5,11 @@
 | AUTHN-001 | Authentication is bypassable or absent on a protected operation | Authentication | Critical–High | anonymous, auth bypass, protected route |
 | AUTHN-002 | Token validation is incomplete | Authentication | Critical–High | JWT, issuer, audience, signature, expiry |
 | AUTHN-003 | Passwords are stored or handled in plaintext | Authentication | Critical | password, plaintext, credential |
-| AUTHN-004 | Password reset or recovery reveals account state or credentials | Authentication | High–Medium | reset, enumeration, recovery |
+| AUTHN-004 | Password reset or recovery reveals account state or credentials | Authentication | High–Medium | reset, enumeration, recovery, login response, user search, account existence |
 | AUTHN-005 | OTP or verification code can be guessed, replayed or abused | Authentication | High–Medium | OTP, verification, replay |
 | AUTHN-006 | Authentication endpoint lacks brute-force and abuse controls | Authentication | Medium–High | rate limit, lockout, credential stuffing |
 | AUTHN-007 | Session or token lifecycle is not enforced | Authentication | Medium–High | session, logout, refresh, revocation, expiry, MFA |
+| AUTHN-008 | An authentication factor can be skipped, or a pre-authentication token is accepted as a full session | Authentication | Critical–High | authentication flow, factor bypass, temporary token, token promotion, OTP, credentialless |
 | AUTHZ-001 | Protected operation lacks effective authorization | Authorization | High–Critical | role, policy, authorization |
 | AUTHZ-002 | Broken object-level authorization / IDOR | Authorization | High–Critical | BOLA, IDOR, object ID |
 | AUTHZ-003 | Function-level authorization is inconsistent across sibling endpoints | Authorization | High | sibling route, verb, delete |
@@ -39,6 +40,7 @@
 | DATA-001 | Sensitive data is logged, audited or emailed in plaintext | Data Protection | Critical–High | logs, audit, email |
 | DATA-002 | Cryptography uses weak, reversible or misconfigured protection for sensitive data | Data Protection | High–Medium | crypto, encryption, keys |
 | DATA-003 | Transport security is not enforced for sensitive communication | Data Protection | High–Medium | TLS, HTTPS, certificate |
+| DATA-004 | Credential or session token is transmitted in a URL or to an untrusted origin | Data Protection | High–Medium | token in URL, query string, Referer, redirect, third party, log exposure |
 | DB-001 | Database identity has excessive privileges | Database | High | least privilege, grants |
 | DB-002 | Dynamic SQL or unsafe stored-procedure construction uses untrusted input | Database | Critical–High | SQL, stored procedure |
 | DB-003 | Authorization is lost in a lower data-access layer | Database | High | repository, stored procedure, tenant |

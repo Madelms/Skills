@@ -133,10 +133,12 @@ Rules: confidential banner at the top; no secret values, no payloads; real file 
 Review scope, what was verified against (Source / Repo config / Deployed / External), counts by status and by severity, **NEEDS VERIFICATION on its own line** (severity labelled "if confirmed"), top root causes, chains, and the most important next actions.
 
 ## Inventory summary
-Counts of operations by class: Anonymous (explicit), Anonymous (implicit), Authenticated, Role/policy protected. Then the list of anonymous operations with: Op ID, route + verb, response data class, consumers, justified yes/no. State the completeness check (framework count vs inventory rows) and the coverage-matrix verdict count.
+Counts of operations by class: Anonymous (explicit), Anonymous (implicit), Authenticated, Role/policy protected; and by Classification and Finding status (finding / no finding: justified / requires verification / not applicable). Then the list of anonymous operations with: Op ID, route + verb, response data class, consumers, justified yes/no. State the completeness check (framework count vs inventory rows) and the coverage-matrix verdict count.
 
 ## Inventory table (appendix)
-`Op ID | Route + verb | Handler file:line | Effective AuthN | AuthZ policy/role | Ownership check | Input binding | Response data class | Consumers | Anonymous justified? | Rules applied`
+`Op ID | Route + verb | Handler file:line | Effective AuthN | AuthZ policy/role | Ownership check | Input binding | Response data class | Consumers | Anonymous justified? | Rules applied | Classification | Finding status`
+
+`Classification` and `Finding status` use the values defined in the classification contract in `workflow-review.md` (Phase 3). Every row has both, including rows with no finding.
 
 ## Coverage matrix
 For each anonymous or implicit row: applicable rules x Pass / Fail / N-A, with one line of evidence each.

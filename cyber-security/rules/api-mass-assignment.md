@@ -34,21 +34,23 @@
 
 **Why it matters:** Passwords, tokens, national identifiers and internal secrets can be disclosed even when authorization is correct.
 
-**Detect:** Inspect response DTOs, entity serialization, projections and alternate/admin endpoints.
+**Detect:** Inspect response DTOs, entity serialization, projections and alternate/admin endpoints. Check list, search, directory and bulk-lookup operations (audience lists, search by e-mail or national identifier, "get all" operations) for personal data returned to roles that do not need it, and for response fields that carry infrastructure identifiers (host, instance or tenant tags) or operational detail.
 
 **Evidence:** Response shape and serializer configuration.
 
-**Remediation:** Use purpose-built response DTOs and deny-list sensitive properties at serialization boundaries.
+**Remediation:** Use purpose-built response DTOs and deny-list sensitive properties at serialization boundaries. Return role-specific DTOs; restrict bulk directory and lookup operations to the roles that need them and rate-limit them.
 
 **Regression test:** Sensitive-field contract tests fail the build if protected properties appear.
 
-**False-fix traps:** Removing a field from one endpoint does not remove it from logs, exports or alternate DTOs.
+**False-fix traps:** Removing a field from one endpoint does not remove it from logs, exports or alternate DTOs. Authenticating the caller does not make a bulk personal-data listing acceptable; check what every authenticated role can retrieve.
 
 **False positives:** Fields intentionally returned to their owner or an administrator that the client genuinely needs.
 
-**Provenance:** SRC-002, SRC-003
+**Chains with:** AUTHZ-002, FILE-002
 
-**Version:** 2.0.0
+**Provenance:** SRC-002, SRC-003, SRC-005, SRC-006
+
+**Version:** 2.1.0
 
 ## API-003 — Client controls security-sensitive workflow state
 **Domain:** API  

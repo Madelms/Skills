@@ -1,6 +1,6 @@
 # Cyber Security Skill
 
-Skill version: 2.0.0
+Skill version: 2.1.0
 
 Reusable, evidence-based security engineering playbook for software projects. It is designed to run from Claude against a codebase, a VAPT/pentest/audit report, a remediation tracker, or an earlier review.
 
@@ -26,7 +26,7 @@ Statuses are evidence-driven: FIXED, PARTIALLY FIXED, OPEN, NEEDS VERIFICATION, 
 
 - `SKILL.md`: entry point, mode selection, non-negotiables.
 - `rules/`: 12 domain files plus `INDEX.md`.
-- `references/`: workflows, status and severity, output templates, blind-regression protocol, stack hints.
+- `references/`: workflows, status and severity, output templates, the Security Test Catalog (generic coverage model), blind-regression protocol, stack hints.
 - `knowledge/`: `SOURCES.md` (neutral source IDs), `CHANGELOG.md`, `learn-records/`.
 - `scripts/validate-kb.js`: knowledge-base validator.
 

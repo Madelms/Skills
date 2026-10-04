@@ -5,7 +5,7 @@ description: Personal security-engineering playbook for reviewing any software p
 
 # Cyber Security
 
-**Skill version: 2.0.0** (see `knowledge/CHANGELOG.md`)
+**Skill version: 2.1.0** (see `knowledge/CHANGELOG.md`)
 
 A reusable, evidence-based security playbook. It works on any stack, and it gets better every time it learns from a new report.
 
@@ -65,18 +65,20 @@ Always read `references/status-and-severity.md` before assigning any status or s
 
 | File | Prefix | Covers |
 |---|---|---|
-| `rules/authn.md` | AUTHN | token validation, passwords, OTP, reset, enumeration, brute force, session and token lifecycle |
+| `rules/authn.md` | AUTHN | token validation, passwords, OTP, reset, enumeration, brute force, session and token lifecycle, authentication-factor and temporary-token flow integrity |
 | `rules/authz-idor.md` | AUTHZ | role checks, BOLA/IDOR, ownership on read and write, function-level authz, default-deny, multi-tenancy |
 | `rules/api-mass-assignment.md` | API | mass assignment, over-exposed responses, client-controlled state, endpoint inventory, resource consumption |
 | `rules/input-validation.md` | INPUT | injection (SQL/NoSQL/command/LDAP), XSS sinks, SSRF, deserialization, XML parsing, open redirects and URL embedding |
 | `rules/files-storage.md` | FILE | path traversal, file authz, uploads, listing-with-content, storage proxies, shared file mutation |
 | `rules/secrets-config.md` | SECRET | secrets in source, frontend keys, runtime config exposure, dev shortcuts and runtime-mode selection |
-| `rules/data-protection.md` | DATA | secrets in logs/audit/email, crypto, transport |
+| `rules/data-protection.md` | DATA | secrets in logs/audit/email, crypto, transport, tokens in URLs or sent to third parties |
 | `rules/database.md` | DB | least-privilege accounts, dynamic SQL, lower-layer authorization and tenant predicates |
 | `rules/frontend.md` | FE | token storage, client-side-only checks, privileged UIs trusting stored data, bundles |
 | `rules/business-logic.md` | BIZ | workflow integrity, settings authorization, client-state decisions, outbound-message content, races |
 | `rules/logging-monitoring.md` | LOG | security event logging, audit actor, error leakage, log injection |
 | `rules/platform-deployment.md` | PLAT | debug/diagnostic endpoints, API docs exposure, CORS, headers, TLS, template leftovers, deployment verification, dependency risk |
+
+`references/security-test-catalog.md` is the generic Security Test Coverage Model: 29 areas of test objectives and the cross-cutting techniques (role matrix, identifier and credential variation, response differencing). Use it during the rule sweep to decide what to test, then map findings to rules.
 
 Technology-specific detection hints live in `references/stacks/*.md` (eight fixed sections each, including how to enumerate operations for that framework). Load only the stacks you detect, because rules stay technology-neutral and point there.
 

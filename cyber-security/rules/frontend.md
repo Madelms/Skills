@@ -34,21 +34,23 @@
 
 **Why it matters:** Long-lived bearer tokens in script-accessible storage can be stolen through XSS or malicious extensions.
 
-**Detect:** Inspect localStorage/sessionStorage, cookies, token lifetime and XSS posture.
+**Detect:** Inspect localStorage/sessionStorage, cookies, token lifetime and XSS posture. For cookies carrying a credential check every attribute: HttpOnly, Secure, SameSite and Domain scope. A cookie scoped to a parent domain is shared by every application under it, so one script flaw anywhere exposes every session.
 
 **Evidence:** Storage mechanism and token scope/lifetime.
 
 **Remediation:** Prefer secure, HttpOnly, appropriately scoped cookies where architecture permits; minimize token lifetime and exposure.
 
-**Regression test:** Authentication artifacts follow the approved storage policy and are not exposed to arbitrary script.
+**Regression test:** Authentication artifacts follow the approved storage policy and are not exposed to arbitrary script. The credential cookie is HttpOnly, Secure, SameSite-restricted and scoped to the narrowest host.
 
-**False-fix traps:** Encrypting a token with a key also delivered to JavaScript does not meaningfully protect it.
+**False-fix traps:** Encrypting a token with a key also delivered to JavaScript does not meaningfully protect it. Secure without HttpOnly still lets script read the token; sharing one credential across a parent domain widens the blast radius of any single XSS.
 
 **False positives:** Short-lived tokens held only in memory; cookies with HttpOnly, Secure and SameSite where the architecture requires them.
 
-**Provenance:** SRC-002, SRC-003
+**Chains with:** INPUT-002, DATA-004
 
-**Version:** 2.0.0
+**Provenance:** SRC-002, SRC-003, SRC-005, SRC-006
+
+**Version:** 2.1.0
 
 ## FE-003 — Frontend build exposes privileged configuration or secrets
 **Domain:** Frontend  

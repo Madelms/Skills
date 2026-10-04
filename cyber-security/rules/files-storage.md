@@ -34,21 +34,23 @@
 
 **Why it matters:** A valid file identifier can expose another user's document.
 
-**Detect:** Trace file ID to owner/tenant/parent and test cross-user access.
+**Detect:** Trace file ID to owner/tenant/parent and test cross-user access. Treat unguessable identifiers and file URLs as secrets that other operations may disclose (listings, detail views, expanded queries): check whether any other endpoint returns the identifier and whether the download works without credentials.
 
 **Evidence:** File lookup and authorization path.
 
-**Remediation:** Authorize the stored file record before opening bytes; avoid direct public paths.
+**Remediation:** Authorize the stored file record before opening bytes; avoid direct public paths. Do not rely on unguessable names: authorise every download against the stored record, and rotate identifiers that have been exposed.
 
 **Regression test:** Cross-user file download returns 403/404 as designed.
 
-**False-fix traps:** Authorization on the listing endpoint does not protect a direct download endpoint.
+**False-fix traps:** Authorization on the listing endpoint does not protect a direct download endpoint. A random identifier is not authorization; once any endpoint discloses it, the file is public if the download is unauthenticated.
 
 **False positives:** Intentionally public assets that carry no sensitive content and are served from a separate public location.
 
-**Provenance:** SRC-001
+**Chains with:** AUTHZ-002, API-002, FILE-005
 
-**Version:** 2.0.0
+**Provenance:** SRC-001, SRC-006
+
+**Version:** 2.1.0
 
 ## FILE-003 — File upload permits unsafe content or storage
 **Domain:** Files  
@@ -82,21 +84,21 @@
 
 **Why it matters:** A storage URL or proxy may expose objects independently of application permissions.
 
-**Detect:** Trace object key generation, SAS/pre-signed URLs, container ACLs and proxy authorization.
+**Detect:** Trace object key generation, SAS/pre-signed URLs, container ACLs and proxy authorization. Trace caller-supplied file names or URL-shaped values into storage SDK calls and URI builders, and check what the caller sees on failure: raw provider exceptions or response headers reveal the backend and invite further probing.
 
 **Evidence:** Storage policy and authorization before token/URL issuance.
 
-**Remediation:** Private storage, short-lived scoped URLs and authorization against the stored object.
+**Remediation:** Private storage, short-lived scoped URLs and authorization against the stored object. Accept opaque identifiers, resolve them server-side, return a stable generic error and strip provider headers from any forwarded response.
 
-**Regression test:** Alter object keys and verify access remains denied.
+**Regression test:** Alter object keys and verify access remains denied. Malformed, URL-shaped and out-of-range names return a generic error with no provider text or headers.
 
 **False-fix traps:** A private container is not sufficient if the proxy accepts arbitrary keys.
 
 **False positives:** Pre-signed URLs that are short-lived, scoped to one object and issued only after an authorisation check.
 
-**Provenance:** SRC-001
+**Provenance:** SRC-001, SRC-005
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## FILE-005 — File listing endpoint returns content instead of metadata
 **Domain:** Files  

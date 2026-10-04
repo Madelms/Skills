@@ -25,7 +25,27 @@ A passing `validate-kb.js` proves only that the knowledge base is internally con
 - Path traversal on a download operation, ownership checked on a client-supplied id, whole-entity writes with client-controlled workflow state, committed secrets and signing keys, plaintext password lifecycle, committed runtime-mode config, debug/template endpoints.
 - Chains: traversal to secret read to token forge; mass assignment of a URL/HTML-bearing field to script execution in a privileged UI.
 
-**Pass criteria.** Each important mechanism above is caught in both runs, at least 90% of previously known findings are reproduced, zero broken skill references are reported as gaps, and the validator passes.
+**Pass criteria.** Every important mechanism above is accounted for in both runs (see "Accounting and scoring"), at least 90% of previously known findings are reproduced or explicitly classified, zero broken skill references are reported as gaps, and the validator passes.
+
+## Accounting and scoring (applies to layers B and C)
+
+The reviewer does not have the answer key, so accounting is made against the skill's own structure:
+1. The reviewer runs a normal Review **and** the baseline-compliance form (`SKILL.md`: "check this project against the skill"), so every rule has a disposition (Pass / Fail / Partial / N-A with evidence), and the inventory carries a Classification and Finding status on every row (`workflow-review.md`, classification contract).
+2. The grader maps each answer-key mechanism to the inventory rows, findings, verified controls and rule dispositions that represent it.
+
+Score each important mechanism separately on three questions, and report the counts per category:
+
+| Outcome | Definition |
+|---|---|
+| **Detected as finding** | Represented by a finding with evidence (file:line). |
+| **Detected, justified / no finding** | Explicitly represented (an inventory row, a verified control or a rule disposition) with evidence and a stated reason it is not a finding. Counts as detected. |
+| **Detected, requires verification** | Explicitly represented with the exact deployed or external check. Counts as detected. |
+| **Not applicable** | Explicit, with where the reviewer looked. Counts as accounted for. |
+| **Missed** | Not mentioned anywhere in the inventory, findings, controls or rule dispositions, or only a vague mention without evidence. |
+
+Detection, classification (the judgment) and promotion (becoming a finding) are graded separately. A mechanism that was detected and explicitly classified as justified is detected; one never mentioned is missed. Do not count vague mentions. Where the reviewer's classification looks wrong (for example "justified" for an unjustified exposure), record it as a judgment issue, not as a miss.
+
+**Strict condition for a pass:** in every run, every important mechanism is accounted for (a finding, a justified/no-finding classification with evidence, requires verification, or not applicable) and none is silently omitted.
 
 ## Layer C: generalisation
 

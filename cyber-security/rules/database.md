@@ -20,9 +20,11 @@
 
 **False positives:** Elevated identities used only by migration pipelines and not present at runtime.
 
-**Provenance:** SRC-002, SRC-003
+**Chains with:** INPUT-001, DB-002
 
-**Version:** 2.0.0
+**Provenance:** SRC-002, SRC-003, SRC-006
+
+**Version:** 2.1.0
 
 ## DB-002 — Dynamic SQL or unsafe stored-procedure construction uses untrusted input
 **Domain:** Database  
@@ -32,21 +34,23 @@
 
 **Why it matters:** Stored procedures can be injectable when they concatenate input into executable SQL.
 
-**Detect:** Inspect procedure definitions, ORM raw SQL and string-built filters/order clauses.
+**Detect:** Inspect procedure definitions, ORM raw SQL and string-built filters/order clauses. Inspect the caller as well as the procedure: application code that builds the EXEC/CALL statement text by concatenation is itself injectable even when the procedure is safe.
 
 **Evidence:** Procedure/query construction and parameter usage.
 
-**Remediation:** Parameterize values; allowlist identifiers/order fields; avoid executing concatenated SQL.
+**Remediation:** Parameterize values; allowlist identifiers/order fields; avoid executing concatenated SQL. Call procedures with typed parameters; never compose statement text.
 
-**Regression test:** Injection payloads remain inert through the full API-to-DB path.
+**Regression test:** Injection payloads remain inert through the full API-to-DB path. Quote, delay and type-conversion probes through every API operation that reaches a procedure or raw query remain inert.
 
-**False-fix traps:** A parameterized outer call does not make an internally concatenated procedure safe.
+**False-fix traps:** A parameterized outer call does not make an internally concatenated procedure safe. A managed database platform that blocks dangerous procedures is defence in depth, not remediation: the injection still reads and writes data.
 
 **False positives:** Dynamic SQL that interpolates only allow-listed identifiers and binds all values as parameters.
 
-**Provenance:** SRC-001, SRC-002
+**Chains with:** INPUT-001, DB-001
 
-**Version:** 2.0.0
+**Provenance:** SRC-001, SRC-002, SRC-006
+
+**Version:** 2.1.0
 
 ## DB-003 — Authorization is lost in a lower data-access layer
 **Domain:** Database  

@@ -8,21 +8,23 @@
 
 **Why it matters:** SQL, NoSQL, command, LDAP, expression-language and similar injection can cross trust boundaries.
 
-**Detect:** Trace untrusted input to string-built queries, commands, interpreters or expression evaluators. Include NoSQL query or operator objects built from request bodies, LDAP filters, template or expression engines, and ORM raw-SQL fragments or dynamic filter/order clauses.
+**Detect:** Trace untrusted input to string-built queries, commands, interpreters or expression evaluators. Include NoSQL query or operator objects built from request bodies, LDAP filters, template or expression engines, and ORM raw-SQL fragments or dynamic filter/order clauses. Look for client-supplied filter, where, order or include strings that a dynamic expression library evaluates, and for statement text composed by the caller before it reaches a stored procedure or interpreter (the caller's outer statement is then the injection surface). Probe with a single quote, a delay and a type-conversion error; verbose database errors are a fingerprint. A server-evaluated predicate is a boolean side channel that reads fields the response never returns.
 
 **Evidence:** Sink and missing parameterization/encoding.
 
-**Remediation:** Parameterized APIs, safe builders and allowlists; avoid string concatenation into executable syntax.
+**Remediation:** Parameterized APIs, safe builders and allowlists; avoid string concatenation into executable syntax. Replace client-supplied expression strings with typed filter parameters; if dynamic filtering must remain, allow-list members and methods.
 
-**Regression test:** Injection payloads remain data and cannot alter query/command semantics. Operator-object and filter-syntax payloads sent to document-store and directory queries remain plain data.
+**Regression test:** Injection payloads remain data and cannot alter query/command semantics. Operator-object and filter-syntax payloads sent to document-store and directory queries remain plain data. Expressions containing method calls, arithmetic or object construction are rejected, and filters cannot reach properties the caller may not read.
 
-**False-fix traps:** Input validation alone is weaker than parameterization at the sink.
+**False-fix traps:** Input validation alone is weaker than parameterization at the sink. Hiding fields from the response DTO does not stop a client-supplied predicate from reading them one character at a time.
 
 **False positives:** Values bound as parameters; identifiers chosen from a fixed server-side allow-list; ORM query builders with no raw fragments.
 
-**Provenance:** SRC-002, SRC-003, SRC-004
+**Chains with:** DB-001, DB-002
 
-**Version:** 2.0.0
+**Provenance:** SRC-002, SRC-003, SRC-004, SRC-006
+
+**Version:** 2.1.0
 
 ## INPUT-002 — Untrusted input reaches an unsafe HTML/JavaScript sink
 **Domain:** Input Validation  

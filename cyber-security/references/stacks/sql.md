@@ -26,6 +26,8 @@
 - INSERT INTO ...Log/Audit/History selecting password or token columns; triggers copying rows.
 - xp_cmdshell, OPENROWSET, OPENQUERY, BULK INSERT, CLR assemblies.
 - SELECT * returned from procedures backing public endpoints.
+- `EXEC (@sql)`, `sp_executesql` with concatenated strings, and caller code that builds `EXEC procName ...` text by concatenation.
+- Application-login privileges: `IS_MEMBER`, `sys.database_role_members`, `HAS_PERMS_BY_NAME`, mapping to `dbo`.
 
 ## 5. Common bypasses and pitfalls
 - Dynamic SQL built by concatenating parameters, including search filters, ORDER BY direction or column names, and table names; ORDER BY cannot be parameterised so it needs an allowlist.
@@ -34,6 +36,9 @@
 - Optional filters written as OR @p IS NULL that return all rows when the client omits the value.
 - Over-privileged connection identity, so any injection becomes full compromise (DB-001).
 - Audit/log tables copying sensitive columns or whole rows including secrets (DATA-001).
+- Type-conversion and syntax errors that echo values to the client turn an injection into a fast read channel.
+- A managed platform that blocks dangerous procedures is defence in depth, not a fix: read and write on every table remains.
+- Write access to a role or permission table through an injection is a database-level privilege escalation that bypasses every application check.
 
 ## 6. Evidence to collect
 - Procedure text with the dynamic statement and how each variable reaches it.

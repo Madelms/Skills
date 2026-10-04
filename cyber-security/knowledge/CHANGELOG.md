@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.1.0 — 2026-10-04
+
+Minor release (new rules and substantive improvements; no schema change). Sources: SRC-005 and SRC-006 (independent VAPT assessments), explicit Learn cycle.
+
+**Rules** (59 -> 61)
+- Added AUTHN-008 (authentication factor skipped / pre-authentication token accepted as a full session) and DATA-004 (credential or session token in a URL or sent to an untrusted origin).
+- Improved AUTHN-001, AUTHN-002, AUTHN-004, AUTHN-005, AUTHZ-001, AUTHZ-002, AUTHZ-004, API-002, INPUT-001, DB-002, FILE-002, FILE-004, FE-002, LOG-002, PLAT-003, PLAT-004, PLAT-005, SECRET-003, SECRET-004 (append-only guidance and tests) and added chain links to DB-001.
+- AUTHN-004 now carries Keywords covering sign-in and lookup enumeration (title unchanged to keep the ID and wording stable).
+
+**Coverage model**
+- Added `references/security-test-catalog.md`: 29 test areas with objectives and checks, plus cross-cutting techniques (role matrix, identifier, credential and Origin variation, response differencing, error probing, artifact scan, concurrency).
+- `workflow-review.md`: capability catalogue extended (TOKEN-ACQUIRE, DATA-READ, DATA-WRITE, ROLE-ESCALATE, STATE-CHANGE), nine reusable chain patterns, and a pointer to the catalog in the rule sweep.
+- Stack hints extended for .NET, Angular and SQL.
+
+**Knowledge**
+- SOURCES: added SRC-005 and SRC-006 (class "Evaluation learning"). The two assessment labels name the assessed application at the maintainer's explicit request.
+- Added `knowledge/learn-records/2.1.0-SRC-005-SRC-006.md` (cross-source matrix, dedupe record, rejected patterns).
+
 ## 2.0.0 — 2026-10-04
 
 Major release (schema and workflow changes). Source: SRC-004 (skill evaluation), with baseline additions from SRC-002.

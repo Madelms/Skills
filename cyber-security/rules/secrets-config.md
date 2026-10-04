@@ -58,21 +58,21 @@
 
 **Why it matters:** Public configuration can reveal internal endpoints, feature flags or deployment details useful for attack planning.
 
-**Detect:** Inspect static config assets, deployment-generated files and client-readable settings.
+**Detect:** Inspect static config assets, deployment-generated files and client-readable settings. List every configuration file reachable from the public asset path, not only the active one: variants for other environments or other projects, and development configs bundled by mistake, often hold credentials, staging hosts and different security flags than the active file.
 
 **Evidence:** Public response/file and fields exposed.
 
-**Remediation:** Keep only non-sensitive client configuration public; inject server-only values at runtime.
+**Remediation:** Keep only non-sensitive client configuration public; inject server-only values at runtime. Ship only the active environment's configuration, reject any other config variant under the public asset root in CI, and serve required runtime configuration from an authenticated bootstrap endpoint.
 
-**Regression test:** Public config contains only approved keys and environment values.
+**Regression test:** Public config contains only approved keys and environment values. A scan of the production artifact finds exactly one configuration file for the deployed environment and no credentials in any public file.
 
-**False-fix traps:** Removing a repo file is insufficient if the pipeline regenerates it with sensitive values.
+**False-fix traps:** Removing a repo file is insufficient if the pipeline regenerates it with sensitive values. Fixing the active config while a stale variant with credentials remains one URL away leaves the exposure open.
 
 **False positives:** Intentionally public client configuration with no security-relevant or internal values.
 
-**Provenance:** SRC-001
+**Provenance:** SRC-001, SRC-005, SRC-006
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## SECRET-004 — Environment flags enable insecure development shortcuts
 **Domain:** Configuration  
@@ -82,7 +82,7 @@
 
 **Why it matters:** A deployment label or flag can activate hard-coded tokens, debug endpoints or bypasses.
 
-**Detect:** Search environment branches for bypasses, mock tokens, debug auth and test-only credentials. Include server-side hosting and runtime configuration committed to the repository (hosting config files, launch profiles, container or orchestrator environment settings) that select a development or debug runtime mode.
+**Detect:** Search environment branches for bypasses, mock tokens, debug auth and test-only credentials. Include server-side hosting and runtime configuration committed to the repository (hosting config files, launch profiles, container or orchestrator environment settings) that select a development or debug runtime mode. Include flags that disable an authentication factor or a security check and are read from a publicly served or runtime-editable source: anyone who can edit that file changes the platform's security posture.
 
 **Evidence:** Branch condition and insecure branch. Also the file that selects the runtime mode and what is known about the effective mode on the deployed host.
 
@@ -96,6 +96,6 @@
 
 **Chains with:** PLAT-005
 
-**Provenance:** SRC-001, SRC-002, SRC-004
+**Provenance:** SRC-001, SRC-002, SRC-004, SRC-005
 
-**Version:** 2.0.0
+**Version:** 2.1.0

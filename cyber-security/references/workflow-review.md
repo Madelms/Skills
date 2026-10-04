@@ -86,12 +86,13 @@ The number of operations the framework's own enumeration finds must equal the nu
 
 ### Inventory columns
 
-`Op ID | Route + verb | Handler file:line | Effective AuthN | AuthZ policy/role | Ownership check | Input binding | Response data class | Consumers | Anonymous justified? | Rules applied`
+`Op ID | Route + verb | Handler file:line | Effective AuthN | AuthZ policy/role | Ownership check | Input binding | Response data class | Consumers | Anonymous justified? | Rules applied | Classification | Finding status`
 
 - **Op ID:** `OP-NNN`.
 - **Response data class:** one of `none`, `reference`, `workflow/state`, `PII`, `credentials/secrets`, `file content`.
 - **Input binding:** the DTO/entity/query/route values bound, and whether the whole entity is written.
-- **Anonymous justified?:** yes/no plus the public consumer, or "no consumer".
+- **Anonymous justified?:** yes/no plus the public consumer, or "no consumer". The answer must agree with the Finding status (see the classification contract below).
+- **Classification** and **Finding status:** one value each from the classification contract below.
 
 ### Anonymous-operation checklist
 
@@ -107,6 +108,35 @@ Every anonymous row (explicit or implicit) must be answered in writing:
 
 Every anonymous or implicit row gets a coverage row: applicable rules x Pass / Fail / N-A with evidence. **Completion gate:** the report cannot be finalised while any inventory row has no verdict.
 
+### Classification contract: nothing disappears
+
+Every surface in the inventory, **and every other security-relevant item you examine** (a secret-looking value or key in client assets, a configuration flag, a hosted-service reference, a cookie, a header, a dependency), receives an explicit **Classification** and **Finding status** in the report, even when it does not become a finding. An item must not vanish from the assessment because you decided it is not a finding. The goal is evidence completeness, not false positives: do not turn a legitimately public operation into a vulnerability; keep it visible and justified.
+
+| Classification | Meaning |
+|---|---|
+| Protected / justified | A control is enforced and you saw the evidence. |
+| Intentionally anonymous / justified | Public by design; name the public consumer. |
+| Authenticated but not authorized for this role | Reachable by a role that should not reach it. |
+| Suspicious | Unexplained exposure not yet proven either way. |
+| Vulnerable | Exploitable. |
+| Requires verification | The answer depends on deployed or external state. |
+| Not applicable | The precondition is absent; say where you looked. |
+
+| Finding status | Use |
+|---|---|
+| `Finding F-NNN` | The item is a finding (any severity, including Low and Informational). |
+| `No finding: justified` | With the reason and the evidence (file:line). |
+| `Requires verification` | With the exact check; it is also a NEEDS VERIFICATION item. |
+| `Not applicable` | With where you looked. |
+
+Consistency rules (the report cannot be finalised if one is broken):
+- Vulnerable, and Authenticated-but-not-authorized, always have a `Finding F-NNN`.
+- Suspicious must be resolved to a finding, a justification or Requires verification before the report is final.
+- If **Anonymous justified?** is "no" (for example an anonymous operation consumed only by an admin UI), the status cannot be "No finding": it is a finding (often Low or Informational) or Requires verification, unless you change the justification with evidence.
+- Secret-looking values and keys found in client assets are classified too: public by design with restrictions you verified (justified), restrictions unknown (Requires verification), or privileged/unrestricted (finding). A found key is never left unmentioned.
+
+The report's inventory summary counts rows by Classification and by Finding status, and lists the justified-anonymous rows with their public consumer.
+
 ### Also inventory
 - **Data stores:** DB access style (ORM, raw SQL, stored procedures), connection identities.
 - **File stores:** local paths, blob/S3 proxies, template folders, shared files written at request time.
@@ -117,7 +147,7 @@ Every anonymous or implicit row gets a coverage row: applicable rules x Pass / F
 
 ## 4. Rule sweep
 
-Scan `rules/INDEX.md`, then go domain by domain. For each rule that applies to the inventory:
+Use `references/security-test-catalog.md` as the checklist of test objectives for each area (it lists the checks and the cross-cutting techniques: role matrix, identifier/credential/Origin variation, response differencing). Scan `rules/INDEX.md`, then go domain by domain. For each rule that applies to the inventory:
 1. Follow its **Detect** steps and the stack hints.
 2. Trace the full path when needed: route, controller, service, repository, DB/stored procedure, DTO/response, frontend consumer. Many bugs hide one layer below where the attribute is.
 3. Record: rule ID, instances (file:line), status (`status-and-severity.md`), the **Verified against** layer, severity with reason.
@@ -157,6 +187,11 @@ Capability catalogue (extend it, do not rename existing entries):
 | `SCRIPT-EXEC(role)` | Run script in another user's browser, naming that role |
 | `CROSS-TENANT-WRITE` | Modify another tenant's or user's record |
 | `CODE-EXEC` | Run code on the server |
+| `TOKEN-ACQUIRE` | Obtain a valid session or token without completing authentication |
+| `DATA-READ` | Read bulk or sensitive data (including through an injection or bulk listing) |
+| `DATA-WRITE` | Insert, change or delete data directly (including at the database layer) |
+| `ROLE-ESCALATE` | Gain a role or privilege the caller should not hold |
+| `STATE-CHANGE` | Move a business workflow or financial/resource state |
 
 A **chain** exists when one finding's *provides* satisfies another finding's *requires*. Report chains as `C-NN` with the ordered finding IDs. The chain's severity is the end impact reached, using the entry requirement of the first step. Findings keep their own severity; the chain explains the amplification and is reported separately.
 
@@ -164,6 +199,20 @@ Generic examples:
 - `FILE-READ` (path traversal) leads to `SECRET-READ` (config with signing keys) leads to `TOKEN-FORGE` leads to a privileged API.
 - `FIELD-WRITE` on a URL- or HTML-bearing field (mass assignment) leads past a sanitizer-bypass sink to `SCRIPT-EXEC(admin)` inside a privileged UI.
 - An anonymous reference/workflow listing (`ENUMERATE`) supplies identifiers that make an ownership gap exploitable.
+
+Reusable chain patterns (use them as prompts when linking findings; report only chains actually supported by evidence):
+
+| Pattern | Typical rules |
+|---|---|
+| Weak authentication, then `TOKEN-ACQUIRE`, then `ROLE-ESCALATE` | AUTHN-008, AUTHN-005, AUTHN-002, AUTHZ-001 |
+| Object-level flaw, then `ENUMERATE` identifiers, then `DATA-READ` of sensitive data | AUTHZ-002, API-002 |
+| `DATA-READ` discloses a file identifier, then unauthorised file download (`FILE-READ`) | API-002, FILE-005, FILE-002 |
+| Client-controlled identity or actor, then authorization bypass, then a sensitive business action (`STATE-CHANGE`) | AUTHZ-004, BIZ-003, BIZ-001 |
+| `SECRET-READ` (config or file exposure), then `TOKEN-FORGE` or service compromise | SECRET-001, SECRET-003, FILE-001, AUTHN-002 |
+| Injection, then database `DATA-READ`/`DATA-WRITE`, then authorization bypass (for example writing a role row) | INPUT-001, DB-002, DB-001 |
+| Business-flow authorization flaw, then a financial or state-changing action | BIZ-001, AUTHZ-001 |
+| Race condition, then a duplicate financial or resource operation | BIZ-005 |
+| Token placed in a URL or sent to a partner, then session replay | DATA-004, INPUT-006 |
 
 Rules carry an optional `Chains with:` field to suggest likely partners; use it as a prompt, not a limit.
 

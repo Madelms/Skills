@@ -30,6 +30,10 @@
 - TokenValidationParameters, ValidateIssuer, ValidateAudience, ValidateLifetime.
 - new Random(, BinaryFormatter, TypeNameHandling, DtdProcessing, XmlResolver, Microsoft.Office, Interop.
 - WeatherForecast, ASPNETCORE_ENVIRONMENT, IsDevelopment().
+- Client-supplied expression strings: `System.Linq.Dynamic.Core`, `.Where(string)`, `.OrderBy(string)`, `.Include(string)`, `ParsingConfig`; DTO fields that carry a filter or include expression.
+- Caller-side statement text: `ExecuteSqlRaw`, `FromSqlRaw`, `SqlCommand` text built with `$"..."` or concatenation, `EXEC` strings assembled in code.
+- Header handling: `Request.Headers["Authorization"]`, manual `Replace("Bearer ")`/`Substring`, custom authentication handlers, `ValidateLifetime`, `OnChallenge`, `WWW-Authenticate`, `Origin` checks in middleware.
+- Cookies: `Response.Cookies.Append`, `CookieOptions` (`HttpOnly`, `Secure`, `SameSite`, `Domain`).
 
 ## 5. Common bypasses and pitfalls
 - Ownership/permission helper that returns true for any principal that is not a tenant/regular user (AUTHZ-005); trace every caller.
@@ -40,6 +44,11 @@
 - XmlReader/XmlDocument with DtdProcessing enabled or a resolver set (XXE).
 - Office/COM interop on servers (unsupported, process leaks, content-borne attacks); a shared template file edited in place per request (race conditions, cross-user data leakage).
 - Scaffold WeatherForecast artifacts left in production (PLAT-007).
+- A global exception filter or middleware that turns every failure into a success status hides missing authentication and makes "no token" look like "anonymous".
+- A custom authentication handler or event that falls back to anonymous when a token is expired or invalid, instead of failing the request.
+- An `Origin`-based gate in middleware or the gateway is bypassed by omitting or forging the header; it is not authentication.
+- Dynamic expression evaluation lets a client read fields the response DTO hides, one predicate at a time; hiding the field is not a fix.
+- A cookie with a parent-domain `Domain` is shared by every application under it.
 
 ## 6. Evidence to collect
 - Attributes at each level plus the fallback/default policy lines, with file:line.

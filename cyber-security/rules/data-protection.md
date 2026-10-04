@@ -71,3 +71,31 @@
 **Provenance:** SRC-002, SRC-003
 
 **Version:** 2.0.0
+
+## DATA-004 — Credential or session token is transmitted in a URL or to an untrusted origin
+**Domain:** Data Protection  
+**Severity:** High–Medium  
+**CWE:** CWE-598, CWE-200  
+**OWASP:** A02:2021; A07:2021
+
+**Why it matters:** URLs are stored in browser history, proxy and server logs and analytics, and are sent in Referer headers; a token placed there, or handed to a third-party origin, is exposed to everyone who can read those records.
+
+**Detect:** Find redirects, hand-off flows and links that append tokens, codes or session identifiers to a URL (query string or fragment); return-URL handling that sends credentials to partner hosts; pages that carry a token in the URL and also load third-party resources; and tokens present in access logs.
+
+**Evidence:** The code that builds the URL, the destination host policy, and the log or Referer exposure.
+
+**Remediation:** Never place a session token in a URL; use an authorization-code flow or a one-time value exchanged by POST; allow-list destination hosts (see INPUT-006); set a restrictive Referrer-Policy; rotate tokens that may already sit in third-party logs.
+
+**Regression test:** No credential appears in any URL, redirect or Referer; a hand-off to a partner works with a single-use code and the session token cannot be recovered from the URL.
+
+**False-fix traps:** A shorter token lifetime does not remove the exposure window; stripping the token from the address bar after load does not remove the copies in history and logs; allow-listing the partner does not make the partner's logs safe.
+
+**False positives:** Single-use, short-lived, audience-bound authorization codes (not session tokens) in redirect URLs; signed URLs for intentionally public static resources.
+
+**Chains with:** INPUT-006, FE-002
+
+**Provenance:** SRC-002, SRC-005
+
+**Keywords:** token in URL, query string, Referer, redirect, third party, log exposure
+
+**Version:** 2.1.0

@@ -25,6 +25,10 @@
 - localStorage, sessionStorage, setItem(, Authorization, HttpInterceptor.
 - environment.production, isDevMode, apiKey, secret, password, Bearer.
 - canActivate, CanActivateFn, assets/config, APP_INITIALIZER, sourceMap.
+- Redirects that build a URL with a token: `location.href =`, `window.location`, `ReturnUrl`, `returnUrl` plus `?` concatenation.
+- Client-side factor logic: functions named like `validateOtp`/`sendOtp` that compare a code locally, hard-coded user identifiers or fixed codes in bundles (search minified bundles as well as sources).
+- Config flags that change security behaviour (for example an option that skips a verification step) in `assets/Config/*.json` and `environment*.ts`.
+- `document.cookie` writes (cookie attributes and `domain`) and every `*.json` file under the public asset folder, including variants for other environments or projects.
 
 ## 5. Common bypasses and pitfalls
 - Sanitiser bypass applied to server- or user-supplied HTML/URLs; iframe [src] or anchor href bound to stored data enables script-scheme or phishing URLs.
@@ -34,6 +38,10 @@
 - Keys left in app.module, bundles or published source maps.
 - Interceptor that adds the token to any URL, or scopes URLs by substring match.
 - Guards that decode the token client-side to decide roles.
+- A session token appended to a redirect URL (query or fragment) ends up in history, Referer headers and third-party logs.
+- A client that treats a successful first-step response as being logged in, or special-cases one identity, is implementing a factor bypass in the browser; confirm the server enforces the same rule.
+- Public config that switches off a verification step lets anyone with write access to the static host change the platform's posture.
+- Stale config files from other projects or environments in the build output often carry credentials and different flags.
 
 ## 6. Evidence to collect
 - Sink binding and the origin of the bound value (service call and server field).

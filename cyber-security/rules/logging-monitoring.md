@@ -32,21 +32,21 @@
 
 **Why it matters:** Stack traces, SQL, file paths and configuration can reveal attack paths or secrets.
 
-**Detect:** Exercise errors in production-like mode and inspect API/client responses.
+**Detect:** Exercise errors in production-like mode and inspect API/client responses. Also check status semantics and passthrough: a global handler that returns a success status with an error body (a "mask") hides missing authentication from clients, tests and monitoring; source paths, framework or SDK text, and provider headers forwarded from downstream calls are leaks.
 
 **Evidence:** Response body and error middleware.
 
-**Remediation:** Return stable correlation IDs and generic errors; keep details in protected server logs.
+**Remediation:** Return stable correlation IDs and generic errors; keep details in protected server logs. Return correct status codes with a stable error envelope, and strip downstream provider headers.
 
-**Regression test:** Production error responses contain no stack traces, SQL, secrets or internal paths.
+**Regression test:** Production error responses contain no stack traces, SQL, secrets or internal paths. No error is returned with a success status, and no response contains source paths, framework or SDK text, or downstream provider headers.
 
-**False-fix traps:** Hiding errors in the UI while the API returns them is not sufficient.
+**False-fix traps:** Hiding errors in the UI while the API returns them is not sufficient. A mask that returns a success status for every failure removes the signal that shows whether authentication ran.
 
 **False positives:** Detailed errors enabled only in development and verified disabled in the deployed build.
 
-**Provenance:** SRC-002, SRC-003
+**Provenance:** SRC-002, SRC-003, SRC-005, SRC-006
 
-**Version:** 2.0.0
+**Version:** 2.1.0
 
 ## LOG-003 — Logs or audit records are vulnerable to injection or tampering
 **Domain:** Logging  
