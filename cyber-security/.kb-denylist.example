@@ -1,0 +1,6 @@
+# Copy to .kb-denylist (gitignored) and list confidential terms, one per line.
+# The validator fails if any listed term appears anywhere in the knowledge base.
+# Placeholders only below:
+ExampleClientName
+ExampleProjectName
+internal-host-example

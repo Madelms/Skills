@@ -10,3 +10,7 @@ dist/
 build/
 .vscode/
 .idea/
+
+# Local-only files (never commit)
+.kb-denylist
+*.local.md

@@ -18,7 +18,11 @@
 
 **False-fix traps:** Masking the API response while retaining plaintext audit copies is incomplete.
 
-**Version:** 1.0.0
+**False positives:** Hashed, tokenised or irreversibly masked values; non-sensitive correlation identifiers.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## DATA-002 — Cryptography uses weak, reversible or misconfigured protection for sensitive data
 **Domain:** Data Protection  
@@ -38,7 +42,11 @@
 
 **False-fix traps:** Base64 or reversible encoding is not encryption.
 
-**Version:** 1.0.0
+**False positives:** Hashing used only for non-secret integrity or cache keys; non-security randomness for non-security identifiers.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## DATA-003 — Transport security is not enforced for sensitive communication
 **Domain:** Data Protection  
@@ -58,4 +66,8 @@
 
 **False-fix traps:** Disabling certificate validation to solve test-environment issues is not a fix.
 
-**Version:** 1.0.0
+**False positives:** Plain HTTP on loopback or a verified isolated segment; endpoints that only redirect to HTTPS.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0

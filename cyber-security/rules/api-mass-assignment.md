@@ -1,4 +1,4 @@
-# API and Input-Control Rules
+# API Rules
 
 ## API-001 — Mass assignment binds client input to a privileged entity
 **Domain:** API  
@@ -8,17 +8,23 @@
 
 **Why it matters:** Clients can set ownership, audit, workflow or approval fields that should be server-controlled.
 
-**Detect:** Trace request DTO/entity binding and compare writable fields with trusted fields.
+**Detect:** Trace request DTO/entity binding and compare writable fields with trusted fields. Treat URL-, HTML- and markup-bearing fields as high-value targets: a client that can write them controls later sinks in privileged views (see INPUT-002, INPUT-006).
 
 **Evidence:** DTO, mapper, update method and persisted columns.
 
 **Remediation:** Use narrow command DTOs and explicit allowlists; set server-owned fields from trusted context.
 
-**Regression test:** Send every protected field with attacker values and verify they are ignored/rejected.
+**Regression test:** Send every protected field with attacker values and verify they are ignored/rejected. URL/HTML-bearing fields that are server-controlled or restricted reject attacker values from unauthorised callers.
 
 **False-fix traps:** Authentication plus ownership does not prevent mass assignment.
 
-**Version:** 1.0.0
+**False positives:** Narrow command DTOs that expose only caller-settable fields, even when the entity has the same property names.
+
+**Chains with:** INPUT-002, API-003
+
+**Provenance:** SRC-001, SRC-002, SRC-004
+
+**Version:** 2.0.0
 
 ## API-002 — Sensitive fields are exposed in API responses
 **Domain:** API  
@@ -38,7 +44,11 @@
 
 **False-fix traps:** Removing a field from one endpoint does not remove it from logs, exports or alternate DTOs.
 
-**Version:** 1.0.0
+**False positives:** Fields intentionally returned to their owner or an administrator that the client genuinely needs.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## API-003 — Client controls security-sensitive workflow state
 **Domain:** API  
@@ -58,7 +68,11 @@
 
 **False-fix traps:** Validating a new status value is not enough if the caller is not authorized for that transition.
 
-**Version:** 1.0.0
+**False positives:** Client values that are only requests (for example a requested action) and are validated and decided server-side.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## API-004 — API lacks an authoritative endpoint inventory and negative authorization tests
 **Domain:** API  
@@ -78,64 +92,34 @@
 
 **False-fix traps:** Swagger documentation is not proof that every route is secured.
 
-**Version:** 1.0.0
+**False positives:** Inventories generated from framework metadata that already cover every route; operations documented as internal-only and unreachable externally.
 
-## INPUT-001 — Injection sink receives untrusted input
-**Domain:** Input Validation  
-**Severity:** Critical–High  
-**CWE:** CWE-89, CWE-78, CWE-90  
-**OWASP:** A03:2021 Injection
+**Provenance:** SRC-002, SRC-003
 
-**Why it matters:** SQL, command, LDAP and similar injection can cross trust boundaries.
+**Version:** 2.0.0
 
-**Detect:** Trace untrusted input to string-built queries, commands, interpreters or expression evaluators.
+## API-005 — API lacks limits on resource consumption
+**Domain:** API  
+**Severity:** Medium–High  
+**CWE:** CWE-770, CWE-400  
+**OWASP:** API4:2023
 
-**Evidence:** Sink and missing parameterization/encoding.
+**Why it matters:** Unbounded uploads, page sizes, batch operations or expensive queries let one caller exhaust memory, CPU, storage or paid third-party quotas.
 
-**Remediation:** Parameterized APIs, safe builders and allowlists; avoid string concatenation into executable syntax.
+**Detect:** Inspect upload size limits, pagination and maximum page size, batch and bulk operation sizes, expensive search/export/report operations, request timeouts, concurrency limits and outbound-message or paid-API triggers reachable by anonymous or low-privilege callers.
 
-**Regression test:** Injection payloads remain data and cannot alter query/command semantics.
+**Evidence:** Limit configuration (or its absence), the handler that accepts the size or count, and the cost of one request.
 
-**False-fix traps:** Input validation alone is weaker than parameterization at the sink.
+**Remediation:** Enforce maximum sizes, counts and timeouts at the gateway and in the handler; cap page size; queue or throttle expensive work; authenticate and rate-limit operations that trigger paid or outbound actions.
 
-**Version:** 1.0.0
+**Regression test:** Oversized, over-paged and over-batched requests are rejected with a client error; repeated expensive requests are throttled.
 
-## INPUT-002 — Untrusted input reaches an unsafe HTML/JavaScript sink
-**Domain:** Input Validation  
-**Severity:** High–Critical  
-**CWE:** CWE-79  
-**OWASP:** A03:2021 Injection
+**False-fix traps:** A client-side size check is not a limit; pagination without a maximum page size is not a limit; a gateway limit that does not cover the direct origin address is incomplete.
 
-**Why it matters:** Stored/reflected XSS can execute with another user's privileges.
+**False positives:** Limits enforced by a verified gateway; operations that are inherently cheap and bounded by the data model.
 
-**Detect:** Trace user input into raw HTML, DOM APIs, templates, unsafe URL bindings or HTML rendering libraries.
+**Provenance:** SRC-002
 
-**Evidence:** Source and sink plus context.
+**Keywords:** resource consumption, DoS, upload size, pagination, rate limit
 
-**Remediation:** Contextual output encoding, safe framework bindings and sanitization only where raw HTML is genuinely required.
-
-**Regression test:** Script payloads render inert in every output context.
-
-**False-fix traps:** Encoding for HTML is not equivalent to JavaScript or URL-context encoding.
-
-**Version:** 1.0.0
-
-## INPUT-003 — Server-side request forgery or unsafe outbound URL handling
-**Domain:** Input Validation  
-**Severity:** High  
-**CWE:** CWE-918  
-**OWASP:** A10:2021 SSRF
-
-**Why it matters:** Attackers may make the server access internal services or cloud metadata.
-
-**Detect:** Find HTTP clients using user-controlled URLs, redirects or webhooks; inspect DNS/IP validation.
-
-**Evidence:** URL source, sink and network controls.
-
-**Remediation:** Prefer allowlists of destinations; validate resolved addresses, schemes and redirects; isolate outbound networking.
-
-**Regression test:** Internal/private/link-local addresses and unexpected schemes are rejected.
-
-**False-fix traps:** Blocking one hostname does not prevent DNS rebinding or alternate IP representations.
-
-**Version:** 1.0.0
+**Version:** 2.0.0

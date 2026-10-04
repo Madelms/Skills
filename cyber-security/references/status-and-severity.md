@@ -22,6 +22,25 @@ Tracker files sometimes say "STILL OPEN". Treat it as a synonym of OPEN, and mat
 - A report proven on a deployed environment that predates the fix: code status can be FIXED, but state explicitly that the deployed environment still needs redeploy and retest.
 - If confidence is low, choose the less favourable status and say what would upgrade it.
 
+## Verified against (second axis, mandatory)
+
+Every finding also states the layer its status was verified against. A status without a layer is incomplete.
+
+| Layer | Meaning | Can support |
+|---|---|---|
+| **Source** | The code paths were read. | FIXED / OPEN / PARTIALLY FIXED for the code. |
+| **Repo config** | A config file committed to the repository. | OPEN (repo config) or FIXED (repo config). |
+| **Deployed** | A running environment was observed (live request, deployed file, effective settings). | Any status for the deployed state. |
+| **External** | Cloud console, key management, DB server settings, pipeline variables. | Any status for that external state. |
+
+Rules:
+- FIXED and OPEN are claimed only for the layer actually verified. **Never claim FIXED for an unverified deployment state.**
+- A claim about deployed or external state that you could not observe is NEEDS VERIFICATION, with the exact check to run.
+- Insecure config committed to the repo is **OPEN (repo config)**; its deployed effect is NEEDS VERIFICATION.
+- Key or secret rotation cannot be FIXED from source alone: value still present is OPEN; value absent is NEEDS VERIFICATION until rotation is confirmed.
+
+**NEEDS VERIFICATION severity.** Rate the finding "if confirmed" and label it that way. In summaries, count NEEDS VERIFICATION on its own line; do not merge it into OPEN.
+
 ## Severity rubric
 
 Severity uses CVSS-style reasoning in plain language. Score the **realistic** worst case given the controls actually present.
@@ -43,7 +62,7 @@ Write the reason for any severity that differs from the rule's default or from t
 
 One cell, short, scannable, in this order:
 
-`STATUS — what is true now (evidence file:line). Remaining: what is not done. [Root cause RC-n] [Deploy: retest needed]`
+`STATUS (Verified against: <layer>) — what is true now (evidence file:line). Remaining: what is not done. [Root cause RC-n] [Chain C-nn] [Deploy: retest needed]`
 
 Example:
-`PARTIALLY FIXED — endpoint now requires the client token plus ownership of the route id (OrdersController.cs:88-93). Remaining: binds the full entity, so the client can set status/approvedBy (OrderRepository.cs:40). RC-3 mass assignment.`
+`PARTIALLY FIXED (Verified against: Source) — endpoint now requires the client token plus ownership of the route id (OrdersController.cs:88-93). Remaining: binds the full entity, so the client can set status/approvedBy (OrderRepository.cs:40). RC-3 mass assignment.`

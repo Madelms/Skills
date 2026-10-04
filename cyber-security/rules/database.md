@@ -18,7 +18,11 @@
 
 **False-fix traps:** Application-level authorization does not replace database least privilege.
 
-**Version:** 1.0.0
+**False positives:** Elevated identities used only by migration pipelines and not present at runtime.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## DB-002 — Dynamic SQL or unsafe stored-procedure construction uses untrusted input
 **Domain:** Database  
@@ -38,7 +42,11 @@
 
 **False-fix traps:** A parameterized outer call does not make an internally concatenated procedure safe.
 
-**Version:** 1.0.0
+**False positives:** Dynamic SQL that interpolates only allow-listed identifiers and binds all values as parameters.
+
+**Provenance:** SRC-001, SRC-002
+
+**Version:** 2.0.0
 
 ## DB-003 — Authorization is lost in a lower data-access layer
 **Domain:** Database  
@@ -48,14 +56,18 @@
 
 **Why it matters:** A secure controller can call a repository/procedure that accepts arbitrary IDs.
 
-**Detect:** Trace authorization target through repository queries and stored procedures; inspect whether tenant/owner predicates are mandatory.
+**Detect:** Trace authorization target through repository queries and stored procedures; inspect whether tenant/owner predicates are mandatory. Check that the tenant or owner predicate is a mandatory input of every data-access method, not an optional filter the caller may omit.
 
 **Evidence:** Final SQL/procedure parameters and predicates.
 
-**Remediation:** Keep authorization close to the resource decision and constrain data access with trusted context where practical.
+**Remediation:** Keep authorization close to the resource decision and constrain data access with trusted context where practical. Make the tenant/owner predicate a required parameter, or enforce it with row-level security or a global query filter, so callers cannot omit it.
 
-**Regression test:** Alternate entry points cannot bypass the ownership/tenant predicate.
+**Regression test:** Alternate entry points cannot bypass the ownership/tenant predicate. Calling the data-access layer with another tenant's identifier returns nothing or fails.
 
 **False-fix traps:** Controller-only checks fail when another route calls the same lower layer.
 
-**Version:** 1.0.0
+**False positives:** Internal data-access methods reachable only through an already-authorised, tenant-scoped path that carries the trusted context.
+
+**Provenance:** SRC-001, SRC-003, SRC-004
+
+**Version:** 2.0.0

@@ -8,17 +8,21 @@
 
 **Why it matters:** Missing security events prevent detection and incident response.
 
-**Detect:** Check authentication failures, privilege changes, sensitive access, admin actions and key configuration changes.
+**Detect:** Check authentication failures, privilege changes, sensitive access, admin actions and key configuration changes. Verify the audit actor comes from the authenticated principal, not a constant or a client-supplied value.
 
 **Evidence:** Event definitions, sinks and retention.
 
-**Remediation:** Log security events with actor, action, target, outcome and correlation ID while minimizing sensitive data.
+**Remediation:** Log security events with actor, action, target, outcome and correlation ID while minimizing sensitive data. Record before/after values for configuration changes with the real authenticated actor.
 
 **Regression test:** Security events are emitted for representative success/failure paths.
 
 **False-fix traps:** Logging every request is not the same as security auditing.
 
-**Version:** 1.0.0
+**False positives:** Events captured by an upstream audit system that is verified to receive them.
+
+**Provenance:** SRC-002, SRC-003, SRC-004
+
+**Version:** 2.0.0
 
 ## LOG-002 — Error handling leaks sensitive implementation details
 **Domain:** Logging  
@@ -38,7 +42,11 @@
 
 **False-fix traps:** Hiding errors in the UI while the API returns them is not sufficient.
 
-**Version:** 1.0.0
+**False positives:** Detailed errors enabled only in development and verified disabled in the deployed build.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## LOG-003 — Logs or audit records are vulnerable to injection or tampering
 **Domain:** Logging  
@@ -58,4 +66,8 @@
 
 **False-fix traps:** Escaping at one logger does not protect a separate audit/export sink.
 
-**Version:** 1.0.0
+**False positives:** Structured loggers that encode values as fields so delimiters cannot break a record.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0

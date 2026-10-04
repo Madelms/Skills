@@ -18,7 +18,11 @@
 
 **False-fix traps:** An attribute on one action does not secure sibling actions; a frontend guard is not authentication.
 
-**Version:** 1.0.0
+**False positives:** Operations that are intentionally public (sign-in, health, public content) are acceptable when explicitly marked and justified by a public consumer.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## AUTHN-002 — Token validation is incomplete
 **Domain:** Authentication  
@@ -38,7 +42,13 @@
 
 **False-fix traps:** Correct validation with an exposed signing key is only partial.
 
-**Version:** 1.0.0
+**False positives:** Tokens validated by an upstream gateway that is the only network path to the service are acceptable when that is verified, not assumed.
+
+**Chains with:** SECRET-001, FILE-001
+
+**Provenance:** SRC-001, SRC-002
+
+**Version:** 2.0.0
 
 ## AUTHN-003 — Passwords are stored or handled in plaintext
 **Domain:** Authentication  
@@ -58,7 +68,11 @@
 
 **False-fix traps:** Removing the password from one DTO does not fix email, logs or alternate endpoints.
 
-**Version:** 1.0.0
+**False positives:** Columns that hold a salted adaptive hash or an opaque token despite a "password" name; fixtures confined to test projects.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## AUTHN-004 — Password reset or recovery reveals account state or credentials
 **Domain:** Authentication  
@@ -78,7 +92,11 @@
 
 **False-fix traps:** Hiding the UI message while the API still differs is not sufficient.
 
-**Version:** 1.0.0
+**False positives:** Responses that are the same for existing and unknown accounts, with only negligible timing noise and no practical oracle.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## AUTHN-005 — OTP or verification code can be guessed, replayed or abused
 **Domain:** Authentication  
@@ -98,7 +116,11 @@
 
 **False-fix traps:** A random-looking code without expiry or consumption remains weak.
 
-**Version:** 1.0.0
+**False positives:** Short numeric codes are acceptable when they are cryptographically random, short-lived, attempt-limited and single-use.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## AUTHN-006 — Authentication endpoint lacks brute-force and abuse controls
 **Domain:** Authentication  
@@ -118,4 +140,36 @@
 
 **False-fix traps:** Client-side timers or CAPTCHA alone are not a server-side rate limit.
 
-**Version:** 1.0.0
+**False positives:** Throttling enforced by a verified gateway or WAF in front of every route; authentication endpoints reachable only from a trusted network.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
+
+## AUTHN-007 — Session or token lifecycle is not enforced
+**Domain:** Authentication  
+**Severity:** Medium–High  
+**CWE:** CWE-613, CWE-384, CWE-308  
+**OWASP:** A07:2021; API2:2023
+
+**Why it matters:** Stolen, stale or leaked credentials stay usable when tokens never expire or cannot be revoked, and privileged accounts that rely on a single factor are easy to take over.
+
+**Detect:** Inspect token and session lifetimes, refresh and rotation, server-side revocation, logout behaviour, idle and absolute expiry, invalidation on password or role change, session regeneration on login, and multi-factor authentication for privileged roles.
+
+**Evidence:** Issuance and validation code, lifetime configuration, revocation store or token-version check, and the logout and password-change handlers.
+
+**Remediation:** Use short access-token lifetimes with rotated refresh tokens; support server-side revocation or token versioning; invalidate sessions on password reset and role change; regenerate the session at login; require a second factor for privileged roles.
+
+**Regression test:** After logout, password change or role change the old token is rejected; expired and reused refresh tokens fail; a privileged login without the second factor is refused.
+
+**False-fix traps:** Deleting the token in the browser is not logout; a short lifetime without revocation still leaves a usable window; MFA on the UI but not on the API proves nothing.
+
+**False positives:** Short-lived stateless tokens with a documented, accepted revocation window; MFA enforced upstream by an identity provider that is verified for the privileged roles.
+
+**Chains with:** AUTHN-002
+
+**Provenance:** SRC-002
+
+**Keywords:** session, logout, refresh, revocation, expiry, MFA
+
+**Version:** 2.0.0

@@ -18,7 +18,13 @@
 
 **False-fix traps:** Checking for `..` alone is bypassable through encoding, separators or symlinks.
 
-**Version:** 1.0.0
+**False positives:** Server-generated opaque identifiers mapped to paths server-side; paths built only from constants.
+
+**Chains with:** SECRET-001, AUTHN-002
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## FILE-002 — File download lacks object-level authorization
 **Domain:** Files  
@@ -38,7 +44,11 @@
 
 **False-fix traps:** Authorization on the listing endpoint does not protect a direct download endpoint.
 
-**Version:** 1.0.0
+**False positives:** Intentionally public assets that carry no sensitive content and are served from a separate public location.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## FILE-003 — File upload permits unsafe content or storage
 **Domain:** Files  
@@ -58,7 +68,11 @@
 
 **False-fix traps:** Client-side extension checks are not security controls.
 
-**Version:** 1.0.0
+**False positives:** Uploads stored in non-executable, non-public storage with generated names and content-type re-validation.
+
+**Provenance:** SRC-002, SRC-003
+
+**Version:** 2.0.0
 
 ## FILE-004 — Storage proxy or blob access bypasses application authorization
 **Domain:** Files  
@@ -78,7 +92,11 @@
 
 **False-fix traps:** A private container is not sufficient if the proxy accepts arbitrary keys.
 
-**Version:** 1.0.0
+**False positives:** Pre-signed URLs that are short-lived, scoped to one object and issued only after an authorisation check.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## FILE-005 — File listing endpoint returns content instead of metadata
 **Domain:** Files  
@@ -88,14 +106,48 @@
 
 **Why it matters:** Broad listing operations can become bulk file exfiltration.
 
-**Detect:** Check whether list/search endpoints return file bytes, base64 or sensitive content for many records.
+**Detect:** Check whether list/search endpoints return file bytes, base64 or sensitive content for many records. Check anonymous and implicit-anonymous list/search operations first: an unauthenticated operation that returns file content is bulk exfiltration. Use the inventory's response data class to find them, and check whether a frontend consumer depends on the content being in the listing.
 
 **Evidence:** Response DTO and query shape.
 
-**Remediation:** Return metadata only; fetch content through separately authorized, bounded operations.
+**Remediation:** Return metadata only; fetch content through separately authorized, bounded operations. Change the backend and the consuming frontend together: the client then fetches content through a separate, authorised download by identifier.
 
-**Regression test:** List response contains no file bytes and content retrieval requires object authorization.
+**Regression test:** List response contains no file bytes and content retrieval requires object authorization. Anonymous callers receive 401/403 on content-bearing listings.
 
 **False-fix traps:** Pagination does not fix unauthorized content exposure.
 
-**Version:** 1.0.0
+**False positives:** Listings that return only metadata (name, size, hash, identifier) or small public icons by design.
+
+**Chains with:** AUTHZ-006
+
+**Provenance:** SRC-001, SRC-004
+
+**Version:** 2.0.0
+
+## FILE-006 — A shared server-side file or template is modified per request
+**Domain:** Files  
+**Severity:** Medium–High  
+**CWE:** CWE-362, CWE-668  
+**OWASP:** A04:2021 Insecure Design
+
+**Why it matters:** Writing request or tenant data into a file shared by all requests leaks one caller's data to another, corrupts output under concurrency and can persist the data.
+
+**Detect:** Find document, report or template generation that opens, edits or saves a shared master file; fixed temporary file names; shared caches or working directories written inside request handlers; and update operations on a shared template record that also receive tenant data.
+
+**Evidence:** File path, the write operation and any locking or per-request copy.
+
+**Remediation:** Generate from a read-only template into a unique per-request private location or in memory, delete the temporary artifact, and never write tenant data back into the shared template.
+
+**Regression test:** Two concurrent requests for different tenants produce independent outputs and the shared file is byte-identical afterwards.
+
+**False-fix traps:** A lock around the shared file serialises requests but still writes one tenant's data where the next request reads it.
+
+**False positives:** Shared files that are read-only at request time; per-request work done on a unique private copy that is cleaned up.
+
+**Chains with:** FILE-002
+
+**Provenance:** SRC-001, SRC-004
+
+**Keywords:** shared file, template, concurrency, cross-tenant, temp file
+
+**Version:** 2.0.0

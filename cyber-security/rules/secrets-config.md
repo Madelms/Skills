@@ -18,7 +18,13 @@
 
 **False-fix traps:** Moving a value to another committed config file is not remediation; rotation matters.
 
-**Version:** 1.0.0
+**False positives:** Placeholders, example configuration, clearly test-scoped keys, and public identifiers that are not secrets.
+
+**Chains with:** AUTHN-002, FILE-001
+
+**Provenance:** SRC-001, SRC-002
+
+**Version:** 2.0.0
 
 ## SECRET-002 — Frontend bundle exposes a credential or unrestricted API key
 **Domain:** Secrets  
@@ -38,7 +44,11 @@
 
 **False-fix traps:** Hiding a key in an environment variable still exposes it after bundling.
 
-**Version:** 1.0.0
+**False positives:** Keys designed for public use whose origin, API and quota restrictions are verified at the provider.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## SECRET-003 — Runtime configuration exposes unnecessary internal topology
 **Domain:** Configuration  
@@ -58,7 +68,11 @@
 
 **False-fix traps:** Removing a repo file is insufficient if the pipeline regenerates it with sensitive values.
 
-**Version:** 1.0.0
+**False positives:** Intentionally public client configuration with no security-relevant or internal values.
+
+**Provenance:** SRC-001
+
+**Version:** 2.0.0
 
 ## SECRET-004 — Environment flags enable insecure development shortcuts
 **Domain:** Configuration  
@@ -68,14 +82,20 @@
 
 **Why it matters:** A deployment label or flag can activate hard-coded tokens, debug endpoints or bypasses.
 
-**Detect:** Search environment branches for bypasses, mock tokens, debug auth and test-only credentials.
+**Detect:** Search environment branches for bypasses, mock tokens, debug auth and test-only credentials. Include server-side hosting and runtime configuration committed to the repository (hosting config files, launch profiles, container or orchestrator environment settings) that select a development or debug runtime mode.
 
-**Evidence:** Branch condition and insecure branch.
+**Evidence:** Branch condition and insecure branch. Also the file that selects the runtime mode and what is known about the effective mode on the deployed host.
 
-**Remediation:** Remove security bypasses from production-capable code; isolate tests/mocks from deployable paths.
+**Remediation:** Remove security bypasses from production-capable code; isolate tests/mocks from deployable paths. Do not commit hosting configuration that selects a development mode; set the mode only in the deployment environment.
 
-**Regression test:** Production-like build cannot activate a security bypass through configuration alone.
+**Regression test:** Production-like build cannot activate a security bypass through configuration alone. The deployed host reports a non-development mode and development-only pages and errors are unavailable.
 
-**False-fix traps:** Correcting the environment value while retaining the bypass code leaves a latent vulnerability.
+**False-fix traps:** Correcting the environment value while retaining the bypass code leaves a latent vulnerability. A committed hosting file that selects a development mode is a repository finding even if the deployed host is believed to override it; the deployed effect needs separate verification.
 
-**Version:** 1.0.0
+**False positives:** Debug features that are compiled out or absent from deployed artifacts; test-only code confined to test projects.
+
+**Chains with:** PLAT-005
+
+**Provenance:** SRC-001, SRC-002, SRC-004
+
+**Version:** 2.0.0

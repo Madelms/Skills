@@ -8,6 +8,7 @@
 | AUTHN-004 | Password reset or recovery reveals account state or credentials | Authentication | High–Medium | reset, enumeration, recovery |
 | AUTHN-005 | OTP or verification code can be guessed, replayed or abused | Authentication | High–Medium | OTP, verification, replay |
 | AUTHN-006 | Authentication endpoint lacks brute-force and abuse controls | Authentication | Medium–High | rate limit, lockout, credential stuffing |
+| AUTHN-007 | Session or token lifecycle is not enforced | Authentication | Medium–High | session, logout, refresh, revocation, expiry, MFA |
 | AUTHZ-001 | Protected operation lacks effective authorization | Authorization | High–Critical | role, policy, authorization |
 | AUTHZ-002 | Broken object-level authorization / IDOR | Authorization | High–Critical | BOLA, IDOR, object ID |
 | AUTHZ-003 | Function-level authorization is inconsistent across sibling endpoints | Authorization | High | sibling route, verb, delete |
@@ -18,20 +19,25 @@
 | API-002 | Sensitive fields are exposed in API responses | API | Critical–Medium | password, PII, DTO, serialization |
 | API-003 | Client controls security-sensitive workflow state | API | High | status, stage, approval |
 | API-004 | API lacks an authoritative endpoint inventory and negative authorization tests | API | Medium–High | route inventory, regression |
+| API-005 | API lacks limits on resource consumption | API | Medium–High | resource consumption, DoS, upload size, pagination, rate limit |
 | INPUT-001 | Injection sink receives untrusted input | Input Validation | Critical–High | SQL, command, LDAP, injection |
 | INPUT-002 | Untrusted input reaches an unsafe HTML/JavaScript sink | Input Validation | High–Critical | XSS, DOM, HTML |
 | INPUT-003 | Server-side request forgery or unsafe outbound URL handling | Input Validation | High | SSRF, webhook, URL |
+| INPUT-004 | Untrusted data reaches an unsafe deserializer | Input Validation | Critical–High | deserialization, serializer, type name, YAML, object loader |
+| INPUT-005 | XML parser configuration allows external entities or expansion | Input Validation | High–Medium | XXE, XML, DTD, entity, SOAP, SVG |
+| INPUT-006 | Untrusted URL is used in navigation, redirect or embedding without an allow-list | Input Validation | Medium–High | open redirect, URL, redirect, iframe, scheme, allow-list |
 | FILE-001 | Path traversal through a user-controlled path component | Files | Critical–High | traversal, filesystem, path |
 | FILE-002 | File download lacks object-level authorization | Files | High | download, file ID, ownership |
 | FILE-003 | File upload permits unsafe content or storage | Files | High | upload, MIME, executable |
 | FILE-004 | Storage proxy or blob access bypasses application authorization | Files | High | blob, object key, SAS |
 | FILE-005 | File listing endpoint returns content instead of metadata | Files | High | listing, bulk disclosure |
+| FILE-006 | A shared server-side file or template is modified per request | Files | Medium–High | shared file, template, concurrency, cross-tenant, temp file |
 | SECRET-001 | Secret or credential committed to source/config | Secrets | Critical–High | password, key, connection string |
 | SECRET-002 | Frontend bundle exposes a credential or unrestricted API key | Secrets | High–Medium | bundle, API key, frontend |
 | SECRET-003 | Runtime configuration exposes unnecessary internal topology | Configuration | Low–Medium | config, topology, public |
 | SECRET-004 | Environment flags enable insecure development shortcuts | Configuration | High | debug, dev shortcut, hard-coded token |
 | DATA-001 | Sensitive data is logged, audited or emailed in plaintext | Data Protection | Critical–High | logs, audit, email |
-| DATA-002 | Cryptography uses weak, reversible or misconfigured protection | Data Protection | High–Medium | crypto, encryption, keys |
+| DATA-002 | Cryptography uses weak, reversible or misconfigured protection for sensitive data | Data Protection | High–Medium | crypto, encryption, keys |
 | DATA-003 | Transport security is not enforced for sensitive communication | Data Protection | High–Medium | TLS, HTTPS, certificate |
 | DB-001 | Database identity has excessive privileges | Database | High | least privilege, grants |
 | DB-002 | Dynamic SQL or unsafe stored-procedure construction uses untrusted input | Database | Critical–High | SQL, stored procedure |
@@ -42,6 +48,8 @@
 | BIZ-001 | Sensitive workflow transition lacks server-side authorization | Business Logic | High | workflow, transition, approval |
 | BIZ-002 | Business-critical setting can be changed without proper authorization | Business Logic | High | settings, admin |
 | BIZ-003 | Security decision depends on attacker-controlled client state | Business Logic | High | isAdmin, eligibility, price |
+| BIZ-004 | Outbound message content or recipients are built from untrusted or unvalidated data | Business Logic | Medium–High | email, SMS, webhook, phishing, template, recipients, header injection |
+| BIZ-005 | Race condition or check-then-act on a limited resource | Business Logic | Medium–High | race condition, TOCTOU, quota, concurrency, idempotency |
 | LOG-001 | Security-relevant failures are not auditable | Logging | Medium | audit, monitoring |
 | LOG-002 | Error handling leaks sensitive implementation details | Logging | Medium–Low | stack trace, error |
 | LOG-003 | Logs or audit records are vulnerable to injection or tampering | Logging | Medium | log injection, audit |
@@ -52,3 +60,4 @@
 | PLAT-005 | Deployment configuration differs materially from source without verification | Platform | High–Medium | pipeline, runtime config |
 | PLAT-006 | TLS/certificate validation is disabled or weakened | Platform | High | certificate, TLS |
 | PLAT-007 | Production contains framework/template artifacts | Platform | Informational–Low | WeatherForecast, scaffold |
+| PLAT-008 | Vulnerable or end-of-life frameworks and dependencies are in use | Platform | Medium–High | dependency, outdated, end-of-life, SCA, framework version |
