@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0 — 2026-10-05
+
+Minor release (deliverable presentation; no rule, schema or finding-logic change).
+
+**Deliverables**
+- Added `references/excel-presentation-standard.md`: Professional Presentation Standard for the Excel tracker (dashboard, colours, sorting, widths, print, data-integrity and QA gate).
+- Added `scripts/build-tracker.js` (with `package.json`, exceljs): generic generator that renders a JSON data file into the tracker; content and presentation are separate and finding data is never altered.
+- `output-templates.md`, `workflow-review.md` and `SKILL.md` point to the standard.
+
 ## 2.1.0 — 2026-10-04
 
 Minor release (new rules and substantive improvements; no schema change). Sources: SRC-005 and SRC-006 (independent VAPT assessments), explicit Learn cycle.

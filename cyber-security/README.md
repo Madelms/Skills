@@ -1,6 +1,6 @@
 # Cyber Security Skill
 
-Skill version: 2.1.0
+Skill version: 2.2.0
 
 Reusable, evidence-based security engineering playbook for software projects. It is designed to run from Claude against a codebase, a VAPT/pentest/audit report, a remediation tracker, or an earlier review.
 

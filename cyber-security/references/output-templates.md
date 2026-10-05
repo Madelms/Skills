@@ -27,6 +27,8 @@ Both are confidential and follow the output-location rule in `workflow-review.md
 
 ### Excel remediation tracker
 
+**Presentation is mandatory and reusable:** read `references/excel-presentation-standard.md` and build the file with `scripts/build-tracker.js`. The sheet and column definitions below are the *content* contract; the standard defines how it is rendered. `Report Summary` is rendered as a dashboard (posture, KPI cards, distributions, priority findings, scope notes); carry any source-breakdown figures through `Discovery Source` and `summaryNotes`.
+
 Sheets, in this order: `Report Summary`, `Issues Tracker`, `Chains and Root Causes`, `Verification Detail`, `Source Reference`, and (when useful) `Developer Assessment`.
 
 **Sheet 1: `Report Summary`.** A real, concise executive summary for management. Top block: project, review date, reviewed commit/branch, input mode (1 or 2), scope, skill version, and what was and was not observable (Source / Repo config / Deployed / External).
@@ -103,7 +105,7 @@ Formatting observed in the reference: both header rows use the header style and 
 - Three things stay separate and are never merged into one column: **Severity** (impact), **Status** (remediation/implementation progress) and **Verification Status** (with its per-layer detail on `Verification Detail`).
 - A planned or implemented remediation is not "fixed". `Status = Implemented` does not change Verification Status. A finding is FIXED only when the evidence for a layer says so, and FIXED is claimed per layer (see `status-and-severity.md`).
 - A layer that was not observed is `Not verified`, never FIXED. Source-code evidence never makes the Deployed layer anything other than `Not verified` or NEEDS VERIFICATION.
-- Keep tracker formatting simple (header row, frozen header, filters, wrapped text). When editing a tracker the user supplied, preserve its existing columns, sheets, comments and formatting (edit the XML directly if a library would drop features).
+- Presentation is governed by `references/excel-presentation-standard.md`: generate the workbook with `scripts/build-tracker.js` from a JSON data file (dashboard, severity/status conditional formatting, sorted, filtered, frozen, print-ready). Formatting never alters finding content. When editing a tracker the user supplied, preserve its existing columns, sheets, comments and formatting (edit the XML directly if a library would drop features).
 
 ### Word summary (about 2 pages)
 

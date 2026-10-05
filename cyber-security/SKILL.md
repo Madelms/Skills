@@ -5,7 +5,7 @@ description: Personal security-engineering playbook for reviewing any software p
 
 # Cyber Security
 
-**Skill version: 2.1.0** (see `knowledge/CHANGELOG.md`)
+**Skill version: 2.2.0** (see `knowledge/CHANGELOG.md`)
 
 A reusable, evidence-based security playbook. It works on any stack, and it gets better every time it learns from a new report.
 
@@ -39,7 +39,7 @@ Always distinguish four levels: **Reported**, **Observed in source**, **Observed
 
 **Every Review ends with two standardized deliverables**, named from the project's name: `<ProjectName>_Security_Remediation_Tracker.xlsx` (one row per finding; severity, remediation status and per-layer verification status kept separate) and `<ProjectName>_Security_Review_Summary.docx` (about 2 pages). Structure is defined in `references/output-templates.md`.
 
-Always read `references/status-and-severity.md` before assigning any status or severity. Read `references/output-templates.md` before writing any deliverable.
+Always read `references/status-and-severity.md` before assigning any status or severity. Read `references/output-templates.md` before writing any deliverable, and `references/excel-presentation-standard.md` before producing the Excel tracker (it is built with `scripts/build-tracker.js`, never formatted by hand).
 
 ## Non-negotiables (and why)
 

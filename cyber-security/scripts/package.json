@@ -1,0 +1,6 @@
+{
+  "name": "cyber-security-skill-scripts",
+  "private": true,
+  "description": "Deliverable generators for the cyber-security skill",
+  "dependencies": { "exceljs": "^4.4.0" }
+}

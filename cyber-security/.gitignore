@@ -14,3 +14,4 @@ build/
 # Local-only files (never commit)
 .kb-denylist
 *.local.md
+scripts/package-lock.json
